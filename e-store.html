@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraStore Pro - Digital E-Commerce 2.0</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Header & Navbar */
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .logo i { color: var(--primary); }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.3rem;
+      border-radius: 30px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .badge {
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.1rem 0.5rem;
+      border-radius: 10px;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .page-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+    .page-section.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Filters */
+    .filter-bar { display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .filter-btn {
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: 0.2s;
+    }
+    .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+    /* Product Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.2rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: 0.3s;
+    }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
+
+    .discount-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.2rem 0.6rem;
+      border-radius: 10px;
+    }
+
+    .product-img {
+      width: 100%;
+      height: 150px;
+      background: #f8fafc;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .product-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+    .product-stock { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin-bottom: 0.5rem; }
+    .product-stock.low { color: var(--danger); }
+
+    .price-box { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+    .current-price { font-weight: 800; color: var(--primary); font-size: 1.2rem; }
+    .old-price { text-decoration: line-through; color: var(--text-muted); font-size: 0.9rem; }
+
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    /* Cart Section */
+    .cart-container { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    @media (max-width: 768px) { .cart-container { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .qty-btn {
+      background: #f1f5f9; border: none; width: 28px; height: 28px;
+      border-radius: 8px; font-weight: 700; cursor: pointer;
+    }
+
+    .promo-box { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .promo-input {
+      flex: 1; padding: 0.6rem; border: 1px solid var(--border); border-radius: 10px; outline: none;
+    }
+
+    /* Form */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .form-group input {
+      width: 100%; padding: 0.8rem; border: 1px solid var(--border);
+      border-radius: 10px; outline: none; background: #fafafa;
+    }
+
+    footer { text-align: center; padding: 1.5rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo" onclick="switchPage('shop')"><i class="fa-solid fa-bag-shopping"></i> AuraStore Pro</div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchPage('shop')"><i class="fa-solid fa-store"></i> Katalog (20)</button>
+      <button class="tab-btn" onclick="switchPage('cart')">
+        <i class="fa-solid fa-cart-shopping"></i> Savatcha <span class="badge" id="cartBadge">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchPage('checkout')"><i class="fa-solid fa-credit-card"></i> To'lov</button>
+      <button class="tab-btn" onclick="switchPage('orders')"><i class="fa-solid fa-box"></i> Buyurtmalar</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- PAGE 1: CATALOG -->
+    <section id="shop" class="page-section active">
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterCategory('all', this)">Barchasi (20)</button>
+        <button class="filter-btn" onclick="filterCategory('audio', this)">Audio & Quloqchinlar</button>
+        <button class="filter-btn" onclick="filterCategory('gadgets', this)">Aqlli Gadjjetlar</button>
+        <button class="filter-btn" onclick="filterCategory('acc', this)">Aksessuarlar</button>
+      </div>
+
+      <div class="products-grid" id="productsGrid"></div>
+    </section>
+
+    <!-- PAGE 2: CART -->
+    <section id="cart" class="page-section">
+      <div class="cart-container">
+        <div class="card">
+          <h3 style="margin-bottom: 1rem;">Xarid Savatchasi</h3>
+          <div id="cartList">
+            <p style="color:var(--text-muted);">Savatchangiz hozircha bo'sh...</p>
+          </div>
+        </div>
+
+        <div class="card" style="height: fit-content;">
+          <h3 style="margin-bottom: 1rem;">Xulosa va Chegirma</h3>
+
+          <div class="promo-box">
+            <input type="text" id="promoInput" class="promo-input" placeholder="Promokod (DISCOUNT20)">
+            <button class="btn" style="width:auto; padding:0.6rem 1rem;" onclick="applyPromo()">Qo'llash</button>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem;">
+            <span style="color:var(--text-muted);">Mahsulotlar:</span>
+            <span id="subtotalPrice">$0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; color:var(--accent);" id="discountRow">
+            <span>Promokod Chegirmasi (20%):</span>
+            <span id="discountVal">-$0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+            <span style="color:var(--text-muted);">Yetkazib berish:</span>
+            <span>$5.00</span>
+          </div>
+          <hr style="border:0; border-top:1px solid var(--border); margin-bottom:1rem;">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.2rem; margin-bottom:1.5rem;">
+            <span>Jami:</span>
+            <span id="totalPrice" style="color:var(--primary);">$0</span>
+          </div>
+          <button class="btn" onclick="switchPage('checkout')">To'lovga O'tish <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: CHECKOUT -->
+    <section id="checkout" class="page-section">
+      <div class="card" style="max-width: 500px; margin: 0 auto;">
+        <h3 style="margin-bottom: 1.5rem;"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> To'lov va Manzil</h3>
+        <form onsubmit="completeOrder(event)">
+          <div class="form-group">
+            <label>Ism Familiya</label>
+            <input type="text" placeholder="Ali Valiyev" required>
+          </div>
+          <div class="form-group">
+            <label>Yetkazib berish manzili</label>
+            <input type="text" placeholder="Toshkent sh., Yunusobod t." required>
+          </div>
+          <div class="form-group">
+            <label>Karta raqami</label>
+            <input type="text" placeholder="8600 0000 0000 0000" required>
+          </div>
+          <button class="btn" type="submit" style="margin-top:1rem;">Buyurtmani Tasdiqlash</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PAGE 4: ORDERS -->
+    <section id="orders" class="page-section">
+      <div class="card">
+        <h3 style="margin-bottom: 1rem;">Mening Buyurtmalarim History</h3>
+        <div id="ordersList">
+          <p style="color:var(--text-muted);">Hozircha xaridlar mavjud emas.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>&copy; 2026 AuraStore Pro. Barcha huquqlar saqlangan.</p>
+  </footer>
+
+  <script>
+    // 20 REAL PRODUCTS WITH STOCK & DISCOUNTS
+    const products = [
+      { id: 1, name: "AirPods Pro Max", price: 299, oldPrice: 350, stock: 12, category: "audio", icon: "fa-headphones", discount: "-15%" },
+      { id: 2, name: "Apple Watch Ultra 2", price: 420, oldPrice: 500, stock: 18, category: "gadgets", icon: "fa-stopwatch", discount: "-16%" },
+      { id: 3, name: "JBL Boombox 3", price: 180, oldPrice: 220, stock: 8, category: "audio", icon: "fa-volume-high", discount: "-18%" },
+      { id: 4, name: "Keychron K2 Keyboard", price: 95, oldPrice: 120, stock: 15, category: "acc", icon: "fa-keyboard", discount: "-20%" },
+      { id: 5, name: "Logitech MX Master 3S", price: 85, oldPrice: 105, stock: 20, category: "acc", icon: "fa-mouse", discount: "-19%" },
+      { id: 6, name: "Sony WH-1000XM5", price: 340, oldPrice: 400, stock: 10, category: "audio", icon: "fa-headphones-simple", discount: "-15%" },
+      { id: 7, name: "Samsung Galaxy Watch 6", price: 260, oldPrice: 310, stock: 14, category: "gadgets", icon: "fa-clock", discount: "-16%" },
+      { id: 8, name: "Anker PowerBank 24,000", price: 65, oldPrice: 80, stock: 19, category: "acc", icon: "fa-battery-full", discount: "-18%" },
+      { id: 9, name: "Bose SoundLink Flex", price: 130, oldPrice: 160, stock: 11, category: "audio", icon: "fa-radio", discount: "-18%" },
+      { id: 10, name: "Kindle Paperwhite 11", price: 140, oldPrice: 175, stock: 16, category: "gadgets", icon: "fa-book-open", discount: "-20%" },
+      { id: 11, name: "Razer DeathAdder V3", price: 70, oldPrice: 90, stock: 13, category: "acc", icon: "fa-gamepad", discount: "-22%" },
+      { id: 12, name: "Marshall Emberton II", price: 150, oldPrice: 185, stock: 9, category: "audio", icon: "fa-compact-disc", discount: "-19%" },
+      { id: 13, name: "Xiaomi Smart Band 8", price: 45, oldPrice: 60, stock: 20, category: "gadgets", icon: "fa-heart-pulse", discount: "-25%" },
+      { id: 14, name: "MagSafe Wireless Charger", price: 35, oldPrice: 45, stock: 17, category: "acc", icon: "fa-bolt", discount: "-22%" },
+      { id: 15, name: "Beats Studio Pro", price: 280, oldPrice: 350, stock: 7, category: "audio", icon: "fa-sliders", discount: "-20%" },
+      { id: 16, name: "GoPro HERO12 Black", price: 380, oldPrice: 450, stock: 15, category: "gadgets", icon: "fa-camera", discount: "-15%" },
+      { id: 17, name: "SanDisk 1TB Extreme SSD", price: 110, oldPrice: 140, stock: 12, category: "acc", icon: "fa-hard-drive", discount: "-21%" },
+      { id: 18, name: "Sennheiser HD 560S", price: 190, oldPrice: 230, stock: 14, category: "audio", icon: "fa-plug", discount: "-17%" },
+      { id: 19, name: "Garmin Forerunner 265", price: 410, oldPrice: 480, stock: 10, category: "gadgets", icon: "fa-person-running", discount: "-14%" },
+      { id: 20, name: "Elgato Stream Deck MK.2", price: 135, oldPrice: 165, stock: 18, category: "acc", icon: "fa-tv", discount: "-18%" }
+    ];
+
+    let cart = [];
+    let isPromoApplied = false;
+
+    // Render Products Grid
+    function renderProducts(items) {
+      const grid = document.getElementById('productsGrid');
+      grid.innerHTML = items.map(p => `
+        <div class="product-card">
+          <span class="discount-badge">${p.discount} CHEGIRMA</span>
+          <div class="product-img"><i class="fa-solid ${p.icon}"></i></div>
+          <div class="product-title">${p.name}</div>
+          <div class="product-stock ${p.stock < 10 ? 'low' : ''}">Omborda: ${p.stock} ta qoldi</div>
+          <div class="price-box">
+            <span class="current-price">$${p.price}</span>
+            <span class="old-price">$${p.oldPrice}</span>
+          </div>
+          <button class="btn" ${p.stock === 0 ? 'disabled' : ''} onclick="addToCart(${p.id})">
+            <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Savatga Qo\'shish' : 'Tugagan'}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Filter
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if(cat === 'all') renderProducts(products);
+      else renderProducts(products.filter(p => p.category === cat));
+    }
+
+    // Add to Cart
+    function addToCart(id) {
+      const prod = products.find(p => p.id === id);
+      if(prod.stock <= 0) return;
+
+      prod.stock--; // Decrease stock
+      const exist = cart.find(c => c.id === id);
+      if(exist) exist.qty++;
+      else cart.push({ ...prod, qty: 1 });
+
+      renderProducts(products); // Refresh stock in catalog
+      updateCartUI();
+    }
+
+    // Update Cart UI
+    function updateCartUI() {
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('cartBadge').innerText = count;
+
+      const cartList = document.getElementById('cartList');
+      if(cart.length === 0) {
+        cartList.innerHTML = `<p style="color:var(--text-muted);">Savatchangiz hozircha bo'sh...</p>`;
+        document.getElementById('subtotalPrice').innerText = "$0";
+        document.getElementById('totalPrice').innerText = "$0";
+        document.getElementById('discountVal').innerText = "-$0";
+        return;
+      }
+
+      let subtotal = 0;
+      cartList.innerHTML = cart.map(item => {
+        subtotal += item.price * item.qty;
+        return `
+          <div class="cart-item">
+            <div>
+              <div style="font-weight:700;">${item.name}</div>
+              <div style="color:var(--primary); font-weight:700;">$${item.price} x ${item.qty} = $${item.price * item.qty}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+              <b>${item.qty}</b>
+              <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      let discount = isPromoApplied ? subtotal * 0.20 : 0;
+      let finalTotal = (subtotal - discount) + 5;
+
+      document.getElementById('subtotalPrice').innerText = `$${subtotal.toFixed(2)}`;
+      document.getElementById('discountVal').innerText = `-$${discount.toFixed(2)}`;
+      document.getElementById('totalPrice').innerText = `$${finalTotal.toFixed(2)}`;
+    }
+
+    // Change Qty in Cart
+    function changeQty(id, delta) {
+      const cartItem = cart.find(c => c.id === id);
+      const prod = products.find(p => p.id === id);
+
+      if(delta === 1 && prod.stock <= 0) {
+        alert("Kechirasiz, omborda boshqa ushbu mahsulotdan qolmagan!");
+        return;
+      }
+
+      cartItem.qty += delta;
+      prod.stock -= delta;
+
+      if(cartItem.qty <= 0) cart = cart.filter(c => c.id !== id);
+
+      renderProducts(products);
+      updateCartUI();
+    }
+
+    // Apply Promo Code
+    function applyPromo() {
+      const code = document.getElementById('promoInput').value.trim();
+      if(code === 'DISCOUNT20') {
+        isPromoApplied = true;
+        alert("🎉 Tabriklaymiz! 20% chegirma promokodi qo'llandi.");
+        updateCartUI();
+      } else {
+        alert("Noto'g mehnatsiz promokod! (Sinab ko'ring: DISCOUNT20)");
+      }
+    }
+
+    // Tab Navigation
+    function switchPage(pageId) {
+      document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(pageId).classList.add('active');
+      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(pageId));
+      if(activeBtn) activeBtn.classList.add('active');
+    }
+
+    // Complete Order
+    function completeOrder(e) {
+      e.preventDefault();
+      if(cart.length === 0) {
+        alert("Savatchangiz bo'sh!");
+        return;
+      }
+      alert("🎉 Buyurtmangiz muvaffaqiyatli rasmiylashtirildi!");
+      document.getElementById('ordersList').innerHTML = `
+        <div style="background:#f1f5f9; padding:1.2rem; border-radius:12px;">
+          <b>Buyurtma #95840</b> - ${cart.reduce((s,i)=>s+i.qty,0)} ta mahsulot. <span style="color:var(--primary); font-weight:700;">Yetkazilmoqda</span>
+        </div>
+      `;
+      cart = [];
+      updateCartUI();
+      switchPage('orders');
+    }
+
+    // Init
+    renderProducts(products);
+  </script>
+</body>
+</html>
